@@ -81,12 +81,45 @@ head(x_l, n = 5)
     ## 4 Sauda   1954-09-22  5660  5660 FALSE  
     ## 5 Sauda   1955-09-22  5622  5622 FALSE
 
+``` r
+head(x_l)
+```
+
+    ## # A tibble: 6 x 5
+    ##   kommune year         pop  pop. skalert
+    ##   <chr>   <date>     <dbl> <int> <lgl>  
+    ## 1 Sauda   1951-09-22  5348  5348 FALSE  
+    ## 2 Sauda   1952-09-22  5425  5425 FALSE  
+    ## 3 Sauda   1953-09-22  5567  5567 FALSE  
+    ## 4 Sauda   1954-09-22  5660  5660 FALSE  
+    ## 5 Sauda   1955-09-22  5622  5622 FALSE  
+    ## 6 Sauda   1956-09-22  5662  5662 FALSE
+
+``` r
+filter(x_l, year < "1953-09-22" & year > "1950-09-22" )
+```
+
+    ## # A tibble: 52 x 5
+    ##    kommune  year         pop  pop. skalert
+    ##    <chr>    <date>     <dbl> <int> <lgl>  
+    ##  1 Sauda    1951-09-22  5348  5348 FALSE  
+    ##  2 Sauda    1952-09-22  5425  5425 FALSE  
+    ##  3 Finnøy   1951-09-22  1718  1718 FALSE  
+    ##  4 Finnøy   1952-09-22  1716  1716 FALSE  
+    ##  5 Rennesøy 1951-09-22  1483  1483 FALSE  
+    ##  6 Rennesøy 1952-09-22  1458  1458 FALSE  
+    ##  7 Sveio    1951-09-22  1954  1954 FALSE  
+    ##  8 Sveio    1952-09-22  1919  1919 FALSE  
+    ##  9 Bømlo    1951-09-22  1407  1407 FALSE  
+    ## 10 Bømlo    1952-09-22  1412  1412 FALSE  
+    ## # … with 42 more rows
+
 ## Plot av dataene
 
 ### Ikke skalert
 
 ``` r
-ggplot(data = filter(x_l, year < 2020 & !skalert), mapping = aes(x = year, y = pop, group = kommune)) +
+ggplot(data = filter(x_l, year < "2020-09-22"), mapping = aes(x = year, y = pop, group = kommune)) +
   geom_point(mapping = aes(colour = kommune), size = 1.5) +
   geom_line(colour = "Gray80")
 ```
@@ -95,7 +128,7 @@ ggplot(data = filter(x_l, year < 2020 & !skalert), mapping = aes(x = year, y = p
 Skalert
 
 ``` r
-ggplot(data = filter(x_l, year < 2020 & skalert), mapping = aes(x = year, y = pop, group = kommune)) +
+ggplot(data = filter(x_l, year < "2020-09-22"), mapping = aes(x = year, y = pop, group = kommune)) +
   geom_point(mapping = aes(colour = kommune), size = 1.5) +
   geom_line(colour = "Gray80")
 ```
@@ -103,8 +136,49 @@ ggplot(data = filter(x_l, year < 2020 & skalert), mapping = aes(x = year, y = po
 ![](it_fig_files/figure-gfm/plot-skalert-1.png)<!-- --> \#\#\# Alle
 
 ``` r
-ggplot(data = filter(x_l, year < 2020), mapping = aes(x = year, y = pop, group = kommune)) +
+ggplot(data = filter(x_l, year < "2020-09-22"), mapping = aes(x = year, y = pop, group = kommune)) +
   geom_line(mapping = aes(colour = kommune), size = 1.25)
 ```
 
-![](it_fig_files/figure-gfm/plot-begge-1.png)<!-- -->
+![](it_fig_files/figure-gfm/plot-begge-1.png)<!-- --> \#\#\# Utvalg
+
+#### Make subset
+
+``` r
+x_l_s <- x_l %>%
+  filter(year < "2020-09-22") %>%
+  filter(year >= "1951-09-22") %>%
+  filter(kommune %in% c("Askøy", "Fjell", "Finnøy", "Tysnes"))
+```
+
+``` r
+g1 <- ggplot(data = filter(x_l_s, year < "2020-09-22" & year > "1951-09-22"), mapping = aes(x = year, y = pop, group = kommune)) +
+  geom_line(mapping = aes(colour = kommune), size = 0.75)
+g1
+```
+
+![](it_fig_files/figure-gfm/plot-utvalg-1.png)<!-- -->
+
+``` r
+themed <- g1 +
+  theme(
+    legend.justification = c(0, 1),
+    legend.position = c(0, 1)
+  )
+themed
+```
+
+![](it_fig_files/figure-gfm/themed-1.png)<!-- -->
+
+``` r
+g1_bw <- g1 +
+    theme_linedraw() +
+    theme(
+    legend.justification = c(0, 1),
+    legend.position = c(0.05, 0.95)
+  ) 
+
+g1_bw
+```
+
+![](it_fig_files/figure-gfm/bw-1.png)<!-- -->

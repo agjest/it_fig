@@ -30,26 +30,69 @@ x_l[is.na(x_l)] <- 0
 x_l$skalert <- str_detect(x_l$kommune, "_skalert")
 head(x_l, n = 5)
 ```
+```{r}
+
+head(x_l)
+filter(x_l, year < "1953-09-22" & year > "1950-09-22" )
+```
 
 ## Plot av dataene
 
 ### Ikke skalert
 
 ```{r plot-ikke-skalert}
-ggplot(data = filter(x_l, year < 2020 & !skalert), mapping = aes(x = year, y = pop, group = kommune)) +
+ggplot(data = filter(x_l, year < "2020-09-22"), mapping = aes(x = year, y = pop, group = kommune)) +
   geom_point(mapping = aes(colour = kommune), size = 1.5) +
   geom_line(colour = "Gray80")
 ```
 ### Skalert
 
 ```{r plot-skalert}
-ggplot(data = filter(x_l, year < 2020 & skalert), mapping = aes(x = year, y = pop, group = kommune)) +
+ggplot(data = filter(x_l, year < "2020-09-22"), mapping = aes(x = year, y = pop, group = kommune)) +
   geom_point(mapping = aes(colour = kommune), size = 1.5) +
   geom_line(colour = "Gray80")
 ```
 ### Alle
 
 ```{r plot-begge}
-ggplot(data = filter(x_l, year < 2020), mapping = aes(x = year, y = pop, group = kommune)) +
+ggplot(data = filter(x_l, year < "2020-09-22"), mapping = aes(x = year, y = pop, group = kommune)) +
   geom_line(mapping = aes(colour = kommune), size = 1.25)
 ```
+### Utvalg
+
+#### Make subset
+
+```{r subset}
+x_l_s <- x_l %>%
+  filter(year < "2020-09-22") %>%
+  filter(year >= "1951-09-22") %>%
+  filter(kommune %in% c("Askøy", "Fjell", "Finnøy", "Tysnes"))
+```
+
+
+```{r plot-utvalg}
+g1 <- ggplot(data = filter(x_l_s, year < "2020-09-22" & year > "1951-09-22"), mapping = aes(x = year, y = pop, group = kommune)) +
+  geom_line(mapping = aes(colour = kommune), size = 0.75)
+g1
+```
+
+```{r themed}
+themed <- g1 +
+  theme(
+    legend.justification = c(0, 1),
+    legend.position = c(0, 1)
+  )
+themed
+
+```
+```{r bw}
+g1_bw <- g1 +
+    theme_linedraw() +
+    theme(
+    legend.justification = c(0, 1),
+    legend.position = c(0.05, 0.95)
+  ) 
+
+g1_bw
+```
+
