@@ -1,0 +1,54 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup}
+library(tidyverse)
+```
+
+## Lese inn data og tranformere fra wide til long format
+
+```{r read-data}
+# antar at "lokalkommuner.xlsx" er i working directory
+x <- read_xlsx(path = "lokalkommuner.xlsx")
+# ser på 5 første linjer
+head(x, n = 5)
+# går fra wide til long
+x_l <- pivot_longer(x, cols = `1951`:`2020`, names_to = "year", values_to = "pop")
+# pop as integer, year as date
+x_l$pop. <- as.integer(x_l$pop)
+x_l$year <- as.Date(x_l$year, format = "%Y")
+# set name first variable
+names(x_l)[1] <- "kommune"
+#  set missing to 0
+x_l[is.na(x_l)] <- 0
+# Lager indikatorvariabel for skalert
+x_l$skalert <- str_detect(x_l$kommune, "_skalert")
+head(x_l, n = 5)
+```
+
+## Plot av dataene
+
+### Ikke skalert
+
+```{r plot-ikke-skalert}
+ggplot(data = filter(x_l, year < 2020 & !skalert), mapping = aes(x = year, y = pop, group = kommune)) +
+  geom_point(mapping = aes(colour = kommune), size = 1.5) +
+  geom_line(colour = "Gray80")
+```
+### Skalert
+
+```{r plot-skalert}
+ggplot(data = filter(x_l, year < 2020 & skalert), mapping = aes(x = year, y = pop, group = kommune)) +
+  geom_point(mapping = aes(colour = kommune), size = 1.5) +
+  geom_line(colour = "Gray80")
+```
+### Alle
+
+```{r plot-begge}
+ggplot(data = filter(x_l, year < 2020), mapping = aes(x = year, y = pop, group = kommune)) +
+  geom_line(mapping = aes(colour = kommune), size = 1.25)
+```
