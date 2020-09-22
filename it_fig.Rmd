@@ -1,12 +1,13 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output: github_document
 editor_options: 
   chunk_output_type: inline
 ---
 
 ```{r setup}
 library(tidyverse)
+library(readxl)
 ```
 
 ## Lese inn data og tranformere fra wide til long format
