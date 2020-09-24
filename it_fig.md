@@ -59,76 +59,50 @@ head(x, n = 5)
 
 ``` r
 # går fra wide til long
-x_l <- pivot_longer(x, cols = `1951`:`2020`, names_to = "year", values_to = "pop")
-# pop as integer, year as date
-x_l$pop. <- as.integer(x_l$pop)
-x_l$year <- as.Date(x_l$year, format = "%Y")
+x_l <- pivot_longer(x, cols = `1951`:`2020`, names_to = "år", values_to = "befolkning")
+# befolkning as integer, år as date
+x_l$befolkning. <- as.integer(x_l$befolkning)
+x_l$år <- as.Date(x_l$år, format = "%Y")
 # set name first variable
 names(x_l)[1] <- "kommune"
 #  set missing to 0
 x_l[is.na(x_l)] <- 0
-# Lager indikatorvariabel for skalert
-x_l$skalert <- str_detect(x_l$kommune, "_skalert")
 head(x_l, n = 5)
 ```
 
-    ## # A tibble: 5 x 5
-    ##   kommune year         pop  pop. skalert
-    ##   <chr>   <date>     <dbl> <int> <lgl>  
-    ## 1 Sauda   1951-09-22  5348  5348 FALSE  
-    ## 2 Sauda   1952-09-22  5425  5425 FALSE  
-    ## 3 Sauda   1953-09-22  5567  5567 FALSE  
-    ## 4 Sauda   1954-09-22  5660  5660 FALSE  
-    ## 5 Sauda   1955-09-22  5622  5622 FALSE
-
-``` r
-head(x_l)
-```
-
-    ## # A tibble: 6 x 5
-    ##   kommune year         pop  pop. skalert
-    ##   <chr>   <date>     <dbl> <int> <lgl>  
-    ## 1 Sauda   1951-09-22  5348  5348 FALSE  
-    ## 2 Sauda   1952-09-22  5425  5425 FALSE  
-    ## 3 Sauda   1953-09-22  5567  5567 FALSE  
-    ## 4 Sauda   1954-09-22  5660  5660 FALSE  
-    ## 5 Sauda   1955-09-22  5622  5622 FALSE  
-    ## 6 Sauda   1956-09-22  5662  5662 FALSE
-
-``` r
-filter(x_l, year < "1953-09-22" & year > "1950-09-22" )
-```
-
-    ## # A tibble: 52 x 5
-    ##    kommune  year         pop  pop. skalert
-    ##    <chr>    <date>     <dbl> <int> <lgl>  
-    ##  1 Sauda    1951-09-22  5348  5348 FALSE  
-    ##  2 Sauda    1952-09-22  5425  5425 FALSE  
-    ##  3 Finnøy   1951-09-22  1718  1718 FALSE  
-    ##  4 Finnøy   1952-09-22  1716  1716 FALSE  
-    ##  5 Rennesøy 1951-09-22  1483  1483 FALSE  
-    ##  6 Rennesøy 1952-09-22  1458  1458 FALSE  
-    ##  7 Sveio    1951-09-22  1954  1954 FALSE  
-    ##  8 Sveio    1952-09-22  1919  1919 FALSE  
-    ##  9 Bømlo    1951-09-22  1407  1407 FALSE  
-    ## 10 Bømlo    1952-09-22  1412  1412 FALSE  
-    ## # … with 42 more rows
+    ## # A tibble: 5 x 4
+    ##   kommune år         befolkning befolkning.
+    ##   <chr>   <date>          <dbl>       <int>
+    ## 1 Sauda   1951-09-22       5348        5348
+    ## 2 Sauda   1952-09-22       5425        5425
+    ## 3 Sauda   1953-09-22       5567        5567
+    ## 4 Sauda   1954-09-22       5660        5660
+    ## 5 Sauda   1955-09-22       5622        5622
 
 ## Plot av dataene
 
 ### Ikke skalert
 
 ``` r
-ggplot(data = filter(x_l, year < "2020-09-22"), mapping = aes(x = year, y = pop, group = kommune)) +
-  geom_point(mapping = aes(colour = kommune), size = 1.5) +
-  geom_line(colour = "Gray80")
+plot_data <- filter(x_l, år < "2020-09-22")
+
+g3 <- ggplot(data = plot_data, mapping = aes(x = år, y = befolkning, group = kommune)) +
+  geom_line(mapping = aes(colour = kommune), size = 0.5) 
+
+
+themed_g3 <- g3 +
+  theme(
+    legend.justification = c(0, 1),
+    legend.position = "none"
+  )
+
+themed_g3
 ```
 
-![](it_fig_files/figure-gfm/plot-ikke-skalert-1.png)<!-- --> \#\#\#
-Skalert
+![](it_fig_files/figure-gfm/plot-data-1.png)<!-- --> \#\#\# Skalert
 
 ``` r
-ggplot(data = filter(x_l, year < "2020-09-22"), mapping = aes(x = year, y = pop, group = kommune)) +
+ggplot(data = filter(x_l, år < "2020-09-22"), mapping = aes(x = år, y = befolkning, group = kommune)) +
   geom_point(mapping = aes(colour = kommune), size = 1.5) +
   geom_line(colour = "Gray80")
 ```
@@ -136,7 +110,7 @@ ggplot(data = filter(x_l, year < "2020-09-22"), mapping = aes(x = year, y = pop,
 ![](it_fig_files/figure-gfm/plot-skalert-1.png)<!-- --> \#\#\# Alle
 
 ``` r
-ggplot(data = filter(x_l, year < "2020-09-22"), mapping = aes(x = year, y = pop, group = kommune)) +
+ggplot(data = filter(x_l, år < "2020-09-22"), mapping = aes(x = år, y = befolkning, group = kommune)) +
   geom_line(mapping = aes(colour = kommune), size = 1.25)
 ```
 
@@ -146,13 +120,13 @@ ggplot(data = filter(x_l, year < "2020-09-22"), mapping = aes(x = year, y = pop,
 
 ``` r
 x_l_s <- x_l %>%
-  filter(year < "2020-09-22") %>%
-  filter(year >= "1951-09-22") %>%
+  filter(år < "2020-09-22") %>%
+  filter(år >= "1951-09-22") %>%
   filter(kommune %in% c("Askøy", "Fjell", "Finnøy", "Tysnes"))
 ```
 
 ``` r
-g1 <- ggplot(data = filter(x_l_s, year < "2020-09-22" & year > "1951-09-22"), mapping = aes(x = year, y = pop, group = kommune)) +
+g1 <- ggplot(data = filter(x_l_s, år < "2020-09-22" & år > "1951-09-22"), mapping = aes(x = år, y = befolkning, group = kommune)) +
   geom_line(mapping = aes(colour = kommune), size = 0.75)
 g1
 ```
